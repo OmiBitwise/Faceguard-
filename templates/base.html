@@ -223,9 +223,7 @@
     <!-- Main layout -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar 
-            {% if request.path in ['/dashboard', '/settings', '/register_face', '/monitoring'] or request.path.startswith('/dashboard') or request.path.startswith('/settings') or request.path.startswith('/register_face') or request.path.startswith('/monitoring') %} -->
-            <nav class="sidebar col-md-3 col-lg-2 d-md-block">
+            <!-- Sidebar -->
             <nav class="sidebar col-md-3 col-lg-2 d-md-block">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
@@ -277,10 +275,9 @@
                     </ul>
                 </div>
             </nav>
-            <!-- {% endif %} -->
 
-            <!-- Main content area 
-            <main class="main-content{% if request.path in ['/dashboard', '/settings', '/register_face', '/monitoring'] or request.path.startswith('/dashboard') or request.path.startswith('/settings') or request.path.startswith('/register_face') or request.path.startswith('/monitoring') %}col-md-9 ms-sm-auto col-lg-10 px-md-4{% endif %}"> -->
+            <!-- Main content area -->
+            <main class="main-content col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <!-- Flash messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -310,7 +307,6 @@
     
     <!-- Common JS -->
     <script>
-        
         // Socket.io connection
         const socket = io();
         

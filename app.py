@@ -139,6 +139,11 @@ def start_camera():
         monitoring_thread.start()
     return 'Camera started', 200
 
+@app.route('/monitoring')
+def monitoring():
+    # Render the monitoring.html template
+    return render_template('monitoring.html')
+
 @app.route('/stop_camera')
 def stop_camera():
     global camera_active, camera_thread
