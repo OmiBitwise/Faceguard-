@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Live Monitoring - FaceGuard{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-video me-2"></i>Live Security Monitoring
+            </h1>
+            <p class="lead text-muted">
+                The system is actively monitoring for authorized and unauthorized faces.
+            </p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-camera me-2"></i>Live Feed
+                    </h5>
+                </div>
+                <div class="card-body p-0 bg-dark text-center">
+                    <img id="video-feed" src="{{ url_for('video_feed') }}" class="img-fluid" alt="Video Feed">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span id="status-text">Monitoring Active</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Authorized Detections:</strong> <span id="auth-count">0</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Unauthorized Detections:</strong> <span id="unauth-count">0</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Alerts Sent:</strong> <span id="alerts-count">0</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button id="stop-btn" class="btn btn-danger">
+                            <i class="fas fa-stop-circle me-2"></i>Stop Monitoring
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-chart-bar me-2"></i>View Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Events
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="events-list">
+                        <li class="list-group-item text-center text-muted">No events yet</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Connect to WebSocket
+    const socket = io();
+    
+    // Start camera when page loads
+    fetch('/start_camera')
+        .then(response => console.log('Camera started'));
+    
+    // Handle stop button
+    document.getElementById('stop-btn').addEventListener('click', function() {
+        const stopBtn = document.getElementById('stop-btn');
+        stopBtn.disabled = true;
+        stopBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Stopping...';
+    
+        // Update status immediately
+        document.getElementById('status-text').textContent = 'Shutting down...';
+        document.querySelector('#status-text').previousElementSibling.classList.remove('bg-success');
+        document.querySelector('#status-text').previousElementSibling.classList.add('bg-warning');
+        
+        fetch('/stop_camera')
+            .then(response => {
+                console.log('Camera stopped successfully');
+                window.location.href = '/dashboard';
+            })
+
+            .catch(error => {
+            console.error('Error stopping camera:', error);
+            alert('Error stopping camera. Redirecting to dashboard...');
+            window.location.href = '/dashboard';
+        });
+
+        setTimeout(() => {
+        if (stopBtn.disabled) {
+            console.log('Stop request timed out, forcing redirect');
+            window.location.href = '/dashboard';
+        }}, 3000); // 3 second timeout
+    });
+    
+    // Handle WebSocket events
+    socket.on('connect', function() {
+        console.log('Connected to server');
+    });
+    
+    socket.on('status_update', function(data) {
+        document.getElementById('auth-count').textContent = data.authorized_count;
+        document.getElementById('unauth-count').textContent = data.unauthorized_count;
+        document.getElementById('alerts-count').textContent = data.alert_count;
+    });
+    
+    socket.on('detection_event', function(data) {
+        const eventsList = document.getElementById('events-list');
+        
+        // Remove "No events yet" message if it exists
+        if (eventsList.querySelector('.text-muted')) {
+            eventsList.innerHTML = '';
+        }
+        
+        // Add new event to the top of the list
+        const newEvent = document.createElement('li');
+        newEvent.className = 'list-group-item';
+        newEvent.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge ${data.authorized ? 'bg-success' : 'bg-danger'} me-2">
+                        ${data.authorized ? 'Authorized' : 'Unauthorized'}
+                    </span>
+                    <small>${new Date().toLocaleTimeString()}</small>
+                </div>
+                <span>${data.name}</span>
+            </div>
+        `;
+        
+        // Insert at the beginning
+        eventsList.insertBefore(newEvent, eventsList.firstChild);
+        
+        // Keep only the latest 5 events
+        while (eventsList.children.length > 5) {
+            eventsList.removeChild(eventsList.lastChild);
+        }
+    });
+    
+    socket.on('disconnect', function() {
+        document.getElementById('status-text').textContent = 'Connection Lost';
+        document.querySelector('#status-text').previousElementSibling.classList.remove('bg-success');
+        document.querySelector('#status-text').previousElementSibling.classList.add('bg-danger');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}FaceGuard - Facial Recognition Security System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-primary">Intelligent Security at Your Fingertips</h1>
+            <p class="lead my-4">
+                FaceGuard is an advanced facial recognition security system that monitors, detects, and alerts you about unauthorized access in real-time.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a href="/start_monitoring" class="btn btn-primary btn-lg px-4 me-md-2">
+                    <i class="fas fa-video me-2"></i>Start Monitoring
+                </a>
+                <a href="{{ url_for('register_face.register_face') }}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="fas fa-user-plus me-2"></i>Register Face
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg mt-5 mt-lg-0">
+                <img src="/static/img/faceguard-hero.jpg" class="card-img-top" alt="Facial Recognition Illustration">
+                <div class="card-body text-center py-4">
+                    <h5 class="card-title">Real-time Security Monitoring</h5>
+                    <p class="card-text">Protect your space with advanced facial recognition technology.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-5 mt-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">Key Features</h2>
+            <p class="lead text-muted">Our system offers comprehensive security features</p>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-user-check fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Face Recognition</h5>
+                    <p class="card-text">
+                        Accurately identifies authorized individuals through advanced facial recognition algorithms.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-video fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Video Recording</h5>
+                    <p class="card-text">
+                        Automatically records video footage when unauthorized individuals are detected.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-bell fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Instant Alerts</h5>
+                    <p class="card-text">
+                        Sends immediate email notifications with video attachments when security is breached.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-5 mt-3">
+        <div class="col-12 text-center mb-4">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="lead text-muted">Simple, effective, and reliable security</p>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 bg-light border-0">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4">1</span>
+                    </div>
+                    <h5 class="card-title">Register Faces</h5>
+                    <p class="card-text">Add authorized individuals to the system database.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 bg-light border-0">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4">2</span>
+                    </div>
+                    <h5 class="card-title">Configure Alerts</h5>
+                    <p class="card-text">Set up email notification preferences.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 bg-light border-0">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4">3</span>
+                    </div>
+                    <h5 class="card-title">Start Monitoring</h5>
+                    <p class="card-text">Begin real-time surveillance with a single click.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100 bg-light border-0">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <span class="fs-4">4</span>
+                    </div>
+                    <h5 class="card-title">Receive Alerts</h5>
+                    <p class="card-text">Get instant notifications of security concerns.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-5 mt-3">
+        <div class="col-12 text-center">
+            <a href="/dashboard" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-shield-alt me-2"></i>Secure Your Space Now
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

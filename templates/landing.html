@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to FaceGuard - Facial Recognition Security{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex align-items-center">
+    <div class="row w-100">
+        <div class="col-lg-6 p-5">
+            <div class="landing-content p-4">
+                <h1 class="display-3 fw-bold text-primary mb-4">FaceGuard</h1>
+                <h2 class="display-6 mb-4">Intelligent Security at Your Fingertips</h2>
+                <p class="lead mb-5">
+                    Protect your space with advanced facial recognition technology. 
+                    FaceGuard monitors, detects, and alerts you about unauthorized 
+                    access in real-time, giving you peace of mind.
+                </p>
+                
+                <div class="features mb-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-shield-alt text-primary me-3 fa-2x"></i>
+                        <span>Real-time monitoring and detection</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-bell text-primary me-3 fa-2x"></i>
+                        <span>Instant alerts for unauthorized access</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-check text-primary me-3 fa-2x"></i>
+                        <span>Easy face registration for authorized personnel</span>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('register.handle_register') }}" class="btn btn-primary btn-lg px-5 py-3">
+                    Let's Go! <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 bg-primary d-flex align-items-center justify-content-center p-5">
+            <div class="text-center">
+                <div class="logo-container mb-4">
+                    <i class="fas fa-shield-alt text-white fa-8x"></i>
+                </div>
+                <h2 class="text-white display-6 fw-bold">FaceGuard</h2>
+                <p class="text-white-50 lead">Advanced Facial Recognition Security</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
