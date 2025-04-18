@@ -18,6 +18,7 @@ class Camera:
         self.last_unknown_detection_time = 0
         self.unknown_detection_cooldown = 60
         self.authorized_count = 0
+
         self.unauthorized_count = 0
 
         """# NEW: Set lower resolution for better performance
@@ -108,7 +109,7 @@ class Camera:
 
         return frame, self.authorized_count, self.unauthorized_count
 
-    def handle_unauthorized(self, frame):
+    def handle_unauthorized(self):
         current_time = time.time()
         if not self.recording or (current_time - self.last_unknown_detection_time > self.unknown_detection_cooldown):
             self.last_unknown_detection_time = current_time
@@ -138,7 +139,7 @@ class Camera:
             
             return filename
 
-    def stop_recording(self,frame):
+    def stop_recording(self):
         if self.video_writer:
             self.video_writer.release()
             self.video_writer = None
@@ -155,7 +156,7 @@ class Camera:
                     self.frame_count = 0
                     
                 if self.frame_count % 3 != 0:  # Only process every 3rd frame
-                    return frame, self.authorized_count, self.unauthorized_count
+                    return self.authorized_count, self.unauthorized_count
 
                 # Resize BEFORE face detection to improve performance
                 small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
