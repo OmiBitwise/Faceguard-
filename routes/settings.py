@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from database.mongo_db import MongoDB
+from bson import ObjectId 
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -11,16 +12,24 @@ def settings_page():
     mongo_db = MongoDB()
     
     if request.method == 'POST':
-        email_to = request.form.get('email_to')
+        email = request.form.get('email')
+        password = request.form.get('password')
         
-        # Save settings to MongoDB
-        mongo_db.save_settings(email_to)
-        mongo_db.save_user_email(session['user_id'],email_to)
+        # Only update if new values are provided
+        result = mongo_db.update_user_credentials(
+            ObjectId(session['user_id']),
+            email=email if email else None,
+            password=password if password else None
+        )
         
-        flash('Settings saved successfully', 'success')
+        if result:
+            flash('Settings saved successfully', 'success')
+        else:
+            flash('No changes were made', 'info')
+            
         return redirect(url_for('settings.settings_page'))
     
-    # Get current settings
-    settings_data = mongo_db.get_settings(session['user_id'])
+    # Get current user data
+    user_data = mongo_db.find_user_by_id(ObjectId(session['user_id']))
     
-    return render_template('settings.html', settings=settings_data)
+    return render_template('settings.html', user=user_data)

@@ -158,23 +158,35 @@ class MongoDB:
         return list(self.alerts_collection.find().sort("timestamp", -1).limit(limit))
     
     # Settings management
-    def save_settings(self, email_from, email_password, email_to):
-        """Save settings"""
-        settings = {
-            "email_from": email_from,
-            "email_password": email_password,
-            "email_to": email_to,
-            "updated_at": datetime.datetime.now()
-        }
+    def update_user_credentials(self, user_id, email=None, password=None):
+        update_data = {}
+        if email:
+            update_data['email'] = email
+            # Also update the notification email in settings
+            update_data['settings.notification_email'] = email
+            
+        if password:
+            update_data['password'] = generate_password_hash(password)
+            
+        if not update_data:
+            return False  # Nothing to update
+            
+        result = self.users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': update_data}
+        )
         
-        # Remove old settings first
-        self.db.settings.delete_many({})
-        
-        return self.db.settings.insert_one(settings).inserted_id
+        return result.modified_count > 0
     
-    def get_settings(self):
+    def get_settings(self,user_id=None):
         """Get settings"""
-        return self.db.settings.find_one()
+        if user_id:
+            user = self.users_collection.find_one({'_id': ObjectId(user_id)})
+            return user.get('settings', {}) if user else {}
+        else:
+        # Fallback to global settings if needed
+            return self.db.settings.find_one() or {}
+            return self.db.settings.find_one()
     
     # Stats
     def get_stats(self):

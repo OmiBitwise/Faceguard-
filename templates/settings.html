@@ -23,36 +23,29 @@
                         <!-- REMOVED: Sender email and password fields -->
                         
                         <div class="mb-3">
-                            <label for="email_to" class="form-label text-white">Your Email Address</label>
+                            <label for="email_to" class="form-label text-white">Update your Email Address</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-dark border-primary text-primary">
                                     <i class="fas fa-envelope"></i>
                                 </span>
                                 <input type="email" class="form-control bg-dark text-white border-primary" 
-                                       id="email_to" name="email_to" value="{{ settings.email_to }}" 
+                                       id="email_to" name="email" value="{{ user.email_to }}" 
                                        placeholder="your-email@example.com">
                             </div>
                             <div class="form-text text-white">Security alerts and videos will be sent to this email address</div>
                         </div>
                     </div>
-                    
-                    <div class="mt-4">
-                        <h5 class="border-bottom border-secondary pb-2 text-info">
-                            <i class="fas fa-shield-alt me-2"></i>Security Settings
-                        </h5>
-                        
+                    <div>
                         <div class="mb-3">
-                            <label class="form-label text-white">Recognition Confidence Threshold</label>
-                            <div class="d-flex align-items-center">
-                                <input type="range" class="form-range" min="0.4" max="0.8" step="0.05" value="0.55" id="confidence_threshold">
-                                <span class="ms-2 badge bg-primary" id="threshold_value">0.55</span>
+                            <label for="password" class="form-label text-white">Update Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark border-primary text-primary">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control bg-dark text-white border-primary"
+                                       id="password" name="password" placeholder="Enter new password">
                             </div>
-                            <div class="form-text text-white">Higher values mean stricter matching (fewer false positives)</div>
-                        </div>
-                        
-                        <div class="mb-3 form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="enable_notifications" checked>
-                            <label class="form-check-label text-white" for="enable_notifications">Enable Browser Notifications</label>
+                            <div class="form-text text-white">Leave blank if you don't want to change the password.</div>
                         </div>
                     </div>
                     
