@@ -1,3 +1,4 @@
+#project
 from flask import Flask, render_template, session, redirect, url_for, flash , request , Response
 from flask_socketio import SocketIO
 import secrets
@@ -16,7 +17,6 @@ from routes.settings import settings_bp
 from routes.registration import register_bp
 from routes.login import login_bp
 from utils.monitoring import monitoring_bp
-
 
 
 
