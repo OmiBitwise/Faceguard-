@@ -6,7 +6,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card bg-dark border-primary mb-4">
+        <div class="card bg-light border-dark mb-4">
             <div class="card-header bg-primary">
                 <h5 class="mb-0"><i class="fas fa-cog me-2"></i>System Settings</h5>
             </div>
@@ -16,41 +16,41 @@
                         <h5 class="border-bottom border-secondary pb-2 text-info">
                             <i class="fas fa-envelope me-2"></i>Alert Notification Settings
                         </h5>
-                        <p class="text-white mb-3">
+                        <p class="text-dark mb-3">
                             Configure where alert notifications will be sent when unauthorized faces are detected.
                         </p>
                         
                         <!-- REMOVED: Sender email and password fields -->
                         
                         <div class="mb-3">
-                            <label for="email_to" class="form-label text-white">Update your Email Address</label>
+                            <label for="email_to" class="form-label text-dark">Update your Email Address</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-primary text-primary">
+                                <span class="input-group-text bg-light border-secondary text-dark">
                                     <i class="fas fa-envelope"></i>
                                 </span>
-                                <input type="email" class="form-control bg-dark text-white border-primary" 
+                                <input type="email" class="form-control bg-light text-dark border-secondary" 
                                        id="email_to" name="email" value="{{ user.email_to }}" 
                                        placeholder="your-email@example.com">
                             </div>
-                            <div class="form-text text-white">Security alerts and videos will be sent to this email address</div>
+                            <div class="form-text text-dark">Security alerts and videos will be sent to this email address</div>
                         </div>
                     </div>
                     <div>
                         <div class="mb-3">
-                            <label for="password" class="form-label text-white">Update Password</label>
+                            <label for="password" class="form-label text-dark">Update Password</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-dark border-primary text-primary">
+                                <span class="input-group-text bg-light border-secondary text-dark">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <input type="password" class="form-control bg-dark text-white border-primary"
+                                <input type="password" class="form-control bg-light text-dark border-secondary"
                                        id="password" name="password" placeholder="Enter new password">
                             </div>
-                            <div class="form-text text-white">Leave blank if you don't want to change the password.</div>
+                            <div class="form-text text-dark">Leave blank if you don't want to change the password.</div>
                         </div>
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
                             <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -61,13 +61,13 @@
             </div>
         </div>
         
-        <div class="card bg-dark border-warning">
-            <div class="card-header bg-warning text-dark">
+        <div class="card bg-light border-warning">
+            <div class="card-header bg-primary text-dark">
                 <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Important Notes</h5>
             </div>
             <div class="card-body">
-                <p class="text-white"><strong>Email Settings:</strong> Make sure to enter a valid email address where you want to receive security alerts.</p>
-                <p class="text-white mb-0"><strong>Security:</strong> We recommend using a dedicated email address for security notifications.</p>
+                <p class="text-dark"><strong>Email Settings:</strong> Make sure to enter a valid email address where you want to receive security alerts.</p>
+                <p class="text-dark mb-0"><strong>Security:</strong> We recommend using a dedicated email address for security notifications.</p>
             </div>
         </div>
     </div>
