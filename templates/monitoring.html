@@ -43,13 +43,13 @@
                         <span id="status-text">Monitoring Active</span>
                     </div>
                     <div class="mb-3">
-                        <strong>Authorized Detections:</strong> <span id="auth-count">0</span>
+                        <strong>Authorized Detections:</strong> <span id="auth-count">{{ authorized_count }}</span>
                     </div>
                     <div class="mb-3">
-                        <strong>Unauthorized Detections:</strong> <span id="unauth-count">0</span>
+                        <strong>Unauthorized Detections:</strong> <span id="unauth-count">{{ authorized_count }}</span>
                     </div>
                     <div class="mb-3">
-                        <strong>Alerts Sent:</strong> <span id="alerts-count">0</span>
+                        <strong>Alerts Sent:</strong> <span id="alerts-count">{{ alert_count }}</span>
                     </div>
                     <div class="d-grid gap-2">
                         <button id="stop-btn" class="btn btn-danger">
