@@ -7,7 +7,7 @@ load_dotenv()
 
 class Config:
 
-    UPLOAD_FOLDER= 'uploads'
+    UPLOAD_FOLDER= "C://Users//admin//Desktop//TyProject//static//uploads"
     # MongoDB settings
     MONGO_USER = os.environ.get('MONGO_USER')
     MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')

@@ -57,17 +57,11 @@ def dashboard():
 
 
     mongo_db = MongoDB()
-    authorized_faces = mongo_db.get_authorized_faces()
-    # Other dashboard data...
-    return render_template('dashboard.html',
-                            authorized_faces=authorized_faces,
-                        )
-    
-    mongo_db = MongoDB()
-    authorized_faces = mongo_db.get_authorized_faces()
+    user_id = session.get('user_id')
+    authorized_faces = mongo_db.get_authorized_faces(user_id=user_id)
     recent_alerts = mongo_db.get_recent_alerts()
-    stats = mongo_db.get_stats()
-    
+    stats = mongo_db.get_user_stats(user_id=session['user_id'])
+    # Other dashboard data...
     return render_template('dashboard.html', 
                          authorized_faces=authorized_faces, 
                          recent_alerts=recent_alerts,

@@ -4,16 +4,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 import datetime
 import pickle
+import numpy as np
 from config import Config
 
 
 class MongoDB:
     def __init__(self):
-
         try:
             # Connect to MongoDB
             MONGO_URI = Config.MONGO_URI
-            #self.client = MongoClient(MONGO_URI)
             self.client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 
             # Testing the connection
@@ -28,6 +27,7 @@ class MongoDB:
 
             # Create indexes for performance
             self.users_collection.create_index('email', unique=True)
+            #self.faces_collection.create_index('user_id') 
         except Exception as e:
             print(f"MongoDB connection error: {e}")
             raise
@@ -45,9 +45,14 @@ class MongoDB:
                 'settings': {
                     'email_alerts': True,
                     'notification_email': email
+                }
             }
-        }
             result = self.users_collection.insert_one(user)
+            
+            self.current_user_id = str(result.inserted_id) 
+
+            # Initialize user stats when creating a user
+            self.reset_user_stats(str(result.inserted_id))
             return str(result.inserted_id)
         except Exception as e:
             print(f"Error creating user: {e}")
@@ -57,6 +62,7 @@ class MongoDB:
         """Authenticate a user based on email and password"""
         user = self.users_collection.find_one({'email': email})
         if user and check_password_hash(user['password'], password):
+            self.current_user_id = str(user['_id'])
             return user
         return None
     
@@ -82,15 +88,6 @@ class MongoDB:
         )
     
     def save_user_email(self, user_id, email):
-        """
-        Update a specific user's email address in the database 
-        Args:
-            user_id (str): The ID of the user
-            email (str): The email address where alerts should be sent
-        """
-        """if user_id is None:
-         user_id = session.get('user_id')"""
-
         self.db.users.update_one(
             {"_id": user_id},  # Query to find the right user
             {"$set": {"email_to": email}}  # Update operation - only changes the email field
@@ -98,43 +95,79 @@ class MongoDB:
     
     # Face management
     def register_face(self, name, face_encoding, user_id, image_path):
-        """Insert a new face into the database"""
-        face_data = {
-        "user_id": user_id,
-        "name": name,
-        "face_encoding": pickle.dumps(face_encoding),
-        "image_path": image_path,
-        'registered_at': datetime.datetime.now()
-    }
-        return self.faces_collection.insert_one(face_data).inserted_id
-    
-    def get_face_encodings_and_names(self):
-        """Get all face encodings and names"""
-        faces = list(self.faces_collection.find())
-        
-        encodings = []
-        names = []
-        
-        for face in faces:
-            encodings.append(pickle.loads(face["face_encoding"]))
-            names.append(face["name"])
+        try:
+            # Handle numpy array if that's what we're getting
+            if isinstance(face_encoding, np.ndarray):
+                face_encoding_to_store = pickle.dumps(face_encoding)
+            else:
+                # If already a list, pickle it directly
+                face_encoding_to_store = pickle.dumps(face_encoding)
+                
+            face_data = {
+                "user_id": user_id,
+                "name": name,
+                "face_encoding": face_encoding_to_store,
+                "image_path": image_path,
+                'registered_at': datetime.datetime.now()
+            }
             
-        return encodings, names
+            # Debug print to verify data
+            print(f"Registering face: {name} for user {user_id}, image path: {image_path}")
+            
+            return self.faces_collection.insert_one(face_data).inserted_id
+        except Exception as e:
+            print(f"Error registering face: {e}")
+            return None
     
-    def get_authorized_faces(self):
+    def get_face_encodings_and_names(self,user_id=None):
+        """Get all face encodings and names"""
+        try:
+            # Create query filter if user_id is provided
+            query = {}
+            if user_id:
+                query["user_id"] = user_id
+                
+            faces = list(self.faces_collection.find(query))
+            
+            encodings = []
+            names = []
+            
+            for face in faces:
+                try:
+                    # Unpickle the face encoding
+                    encoding = pickle.loads(face["face_encoding"])
+                    encodings.append(encoding)
+                    names.append(face["name"])
+                except Exception as e:
+                    print(f"Error unpickling face encoding: {e}")
+                    continue
+                    
+            return encodings, names
+        except Exception as e:
+            print(f"Error getting face encodings and names: {e}")
+            return [], []
+    
+    
+    def get_authorized_faces(self,user_id=None):
         """Get all authorized faces"""
-        faces = list(self.faces_collection.find({}, {
+        query = {}
+        if user_id:
+            query["user_id"] = user_id
+            
+        faces = list(self.faces_collection.find(query, {
             "_id": 1, 
             "name": 1, 
             "image_path": 1, 
-            "registered_at": 1
+            "registered_at": 1,
+            "user_id": 1
         }))
         return faces
     
     # Alert management
-    def record_alert(self, face_id=None, confidence=None, image_path=None , video_path=None):
+    def record_alert(self, user_id=None,face_id=None, confidence=None, image_path=None , video_path=None):
         """Record a security alert"""
         alert = {
+            'user_id': user_id,
             'timestamp': datetime.datetime.now(),
             'face_id': face_id,
             'confidence': confidence,
@@ -153,9 +186,13 @@ class MongoDB:
             {"$set": {"email_sent": True}}
         )
     
-    def get_recent_alerts(self, limit=10):
+    def get_recent_alerts(self,user_id=None, limit=10):
         """Get recent alerts"""
-        return list(self.alerts_collection.find().sort("timestamp", -1).limit(limit))
+        query = {}
+        if user_id:
+            query["user_id"] = user_id
+            
+        return list(self.alerts_collection.find(query).sort("timestamp", -1).limit(limit))
     
     # Settings management
     def update_user_credentials(self, user_id, email=None, password=None):
@@ -186,42 +223,83 @@ class MongoDB:
         else:
         # Fallback to global settings if needed
             return self.db.settings.find_one() or {}
-            return self.db.settings.find_one()
     
     # Stats
-    def get_stats(self):
-        """Get system stats"""
-        authorized_count = self.db.stats.find_one({"type": "authorized"})
-        #unauthorized_count = self.db.stats.find_one({"type": "unauthorized"})
-        alert_count = self.db.stats.find_one({"type": "alert"})
-        
-        return {
-            "total_authorized": self.faces_collection.count_documents({}),
-            "total_alerts": self.alerts_collection.count_documents({}),
-            "recent_alerts_count": self.alerts_collection.count_documents({
-                "timestamp": {'$gt': datetime.datetime.now() - datetime.timedelta(days=7)}})
+    def get_user_stats(self, user_id):
+        try:
+            stats_collection = self.db.get_collection('user_stats')
+            stats = stats_collection.find_one({"user_id": user_id})
             
-        }
+            if not stats:
+                # Return default stats if none exist yet
+                return {
+                    "user_id": user_id,
+                    "authorized_count": 0,
+                    "unauthorized_count": 0,
+                    "last_updated": None,
+                    "last_reset": None
+                }
+                
+            return stats
+        except Exception as e:
+            print(f"Error getting stats for user {user_id}: {e}")
+            return {
+                "user_id": user_id,
+                "authorized_count": 0,
+                "unauthorized_count": 0,
+                "error": str(e)
+            }
     
-    def update_stats(self, authorized=0, unauthorized=0, alert=0):
-        """Update system stats"""
-        if authorized > 0:
-            self.db.stats.update_one(
-                {"type": "authorized"},
-                {"$inc": {"count": authorized}},
+    def update_user_stats(self, user_id, authorized_increment=0, unauthorized_increment=0):
+        try:
+            stats_collection = self.db.get_collection('user_stats')
+            
+            # Build the update based on provided increments
+            update = {"$inc": {}}
+            
+            if authorized_increment != 0:
+                update["$inc"]["authorized_count"] = authorized_increment
+                
+            if unauthorized_increment != 0:
+                update["$inc"]["unauthorized_count"] = unauthorized_increment
+                
+            if not update["$inc"]:
+                return False  # Nothing to update
+                
+            # Add last updated timestamp
+            update["$set"] = {"last_updated": datetime.datetime.now()}
+            
+            # Update the stats document
+            result = stats_collection.update_one(
+                {"user_id": user_id},
+                update,
                 upsert=True
             )
             
-        if unauthorized > 0:
-            self.db.stats.update_one(
-                {"type": "unauthorized"},
-                {"$inc": {"count": unauthorized}},
+            return result.acknowledged
+        except Exception as e:
+            print(f"Error updating stats for user {user_id}: {e}")
+            return False
+
+    def reset_user_stats(self, user_id):
+        try:
+            # Create a stats document for this user if it doesn't exist
+            stats_collection = self.db.get_collection('user_stats')
+            
+            # Update or create the stats document with reset counters
+            stats_collection.update_one(
+                {"user_id": user_id},
+                {"$set": {
+                    "user_id": user_id,
+                    "authorized_count": 0,
+                    "unauthorized_count": 0,
+                    "last_reset": datetime.datetime.now()
+                }},
                 upsert=True
             )
             
-        if alert > 0:
-            self.db.stats.update_one(
-                {"type": "alert"},
-                {"$inc": {"count": alert}},
-                upsert=True
-            )
+            print(f"Stats reset for user {user_id}")
+            return True
+        except Exception as e:
+            print(f"Error resetting stats for user {user_id}: {e}")
+            return False

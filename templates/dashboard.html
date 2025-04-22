@@ -198,7 +198,7 @@
                             {% for face in authorized_faces %}
                                 <div class="col-md-6 mb-3">
                                     <div class="card h-100">
-                                        <img src="{{ url_for('static', filename=face.image_path.split('static/')[1]) if face.image_path and 'static/' in face.image_path else face.image_path }}" class="card-img-top" alt="{{ face.name }}">
+                                        <img src="{{ url_for('static', filename=face.image_path) }}" class="card-img-top" alt="{{ face.name }}">
                                         <div class="card-body text-center">
                                             <h6 class="card-title mb-0">{{ face.name }}</h6>
                                             <small class="text-muted">Added: {{ face.registered_at.strftime('%Y-%m-%d') if face.registered_at else ''  }}</small>
