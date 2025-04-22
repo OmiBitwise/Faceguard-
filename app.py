@@ -5,6 +5,7 @@ import os , cv2, time , threading
 from database.mongo_db import MongoDB
 from config import Config
 from models.camera1 import Camera
+from utils.jwt_utils import jwt_required
 
 
 camera_thread = None
@@ -37,15 +38,20 @@ app.register_blueprint(login_bp)
 # Main routes
 @app.route('/')
 def index():
+    
     return render_template('landing.html')
 @app.route('/index')
 def homepage():
+    print(request.cookies.get('jwt_token'))
     return render_template('index.html')
 @app.route('/login')
 def landing():
+    
     return render_template('register.handle_register')
 
+
 @app.route('/dashboard')
+@jwt_required
 def dashboard():
 
 
@@ -101,9 +107,11 @@ def video_feed():
 
 @app.route('/logout')
 def logout():
-    session.clear()
+    response = redirect(url_for('login.handle_login'))
+    response.set_cookie('jwt_token', '', expires=0)
     flash('You have been logged out', 'info')
-    return redirect(url_for('login.handle_login'))
+    return response
+
 
 
 
@@ -118,6 +126,7 @@ def handle_disconnect():
 
 # Socket event handlers for monitoring
 @socketio.on('start_monitoring')
+@jwt_required
 def handle_start_monitoring():
     global camera_thread, camera_active
     

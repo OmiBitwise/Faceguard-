@@ -1,6 +1,7 @@
-from flask import Blueprint,render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, make_response,render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
 from database.mongo_db import MongoDB
+from utils.jwt_utils import generate_jwt
 
 login_bp = Blueprint('login', __name__)
 
@@ -36,8 +37,13 @@ def handle_login():
             session['username'] = user['username']
             session['email'] = user['email']
             
+            token = generate_jwt(user['_id'], user['username'], user['email'])
+
+      
+            response = make_response(redirect(url_for('index')))
+            response.set_cookie('jwt_token', token, httponly=True, max_age=3600)
             flash(f'Welcome back, {user["username"]}!', 'success')
-            return redirect(url_for('homepage'))
+            return response
         else:
             flash('Invalid email or password','error')
     

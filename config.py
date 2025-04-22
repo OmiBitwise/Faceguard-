@@ -2,6 +2,7 @@ import os
 from urllib.parse import quote_plus
 from dotenv import load_dotenv 
 
+
 load_dotenv()
 
 class Config:
@@ -26,5 +27,7 @@ class Config:
     'email_password': 'clsv tcln nhvp ghco',    # Replace with your app password
     'smtp_server': 'smtp.gmail.com',
     'smtp_port': 587}
+
+    SECRET_KEY = os.environ.get("SECRET_KEY")
 
         
