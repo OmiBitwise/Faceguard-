@@ -40,7 +40,7 @@ def handle_login():
             token = generate_jwt(user['_id'], user['username'], user['email'])
 
       
-            response = make_response(redirect(url_for('index')))
+            response = make_response(redirect(url_for('homepage')))
             response.set_cookie('jwt_token', token, httponly=True, max_age=3600)
             flash(f'Welcome back, {user["username"]}!', 'success')
             return response

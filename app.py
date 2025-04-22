@@ -41,6 +41,7 @@ def index():
     
     return render_template('landing.html')
 @app.route('/index')
+@jwt_required
 def homepage():
     print(request.cookies.get('jwt_token'))
     return render_template('index.html')

@@ -42,6 +42,19 @@ def jwt_required(view_func):
         # Optionally: attach user info to request context
         request.user = payload
         return view_func(*args, **kwargs)
-
     return wrapper
+def jwt_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.cookies.get('jwt_token')
+        if not token:
+            return redirect(url_for('login.handle_login'))
+        
+        user_data = decode_jwt(token)
+        if not user_data:
+            return redirect(url_for('login.handle_login'))
 
+        # You can optionally attach user info to `request` if needed
+        request.user = user_data
+        return f(*args, **kwargs)
+    return decorated_function
