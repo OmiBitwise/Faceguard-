@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash
 from database.mongo_db import MongoDB
+import re
 
 register_bp = Blueprint('register', __name__)
 
@@ -25,6 +26,18 @@ def handle_register():
         
         if password != confirm_password:
             flash('Passwords do not match', 'error')
+            return render_template('register.html')
+        
+        if "@" not in email or "gmail.com" not in email:
+            flash('Email must be a valid Gmail address', 'error')
+            return render_template('register.html')
+        
+        password_pattern = re.compile(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{7,}$'
+)
+
+        if not password_pattern.match(password):
+            flash('Password must be more than 6 characters and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.', 'error')
             return render_template('register.html')
         
         # Check if user already exists
